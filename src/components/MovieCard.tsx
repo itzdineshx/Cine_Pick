@@ -1,6 +1,7 @@
 import { Star, Clock, Calendar, Globe, Play, RotateCcw, Film, Heart, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import OptimizedImage from "@/components/OptimizedImage";
 
 interface Genre {
@@ -179,57 +180,78 @@ const MovieCard = ({ movie, onPickAnother, onWatchTrailer, onToggleFavorite, isF
           </div>
 
           {/* Enhanced Action Buttons */}
-          <div className="space-y-3 pt-2">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <Button
-                onClick={() => onWatchTrailer(movie.title)}
-                className="group bg-gradient-to-r from-cinema-gold to-cinema-gold/90 text-background hover:from-cinema-gold/90 hover:to-cinema-gold font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-2xl animate-glow-pulse"
-                size="lg"
-              >
-                <Play className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform duration-300" />
-                🎥 Watch Trailer
-              </Button>
-              
-              <Button
-                onClick={onPickAnother}
-                variant="outline"
-                className="group border-2 border-cinema-gold text-cinema-gold hover:bg-cinema-gold hover:text-background font-semibold transition-all duration-300 transform hover:scale-105"
-                size="lg"
-              >
-                <RotateCcw className="w-5 h-5 mr-2 group-hover:rotate-180 transition-transform duration-500" />
-                🍿 Pick Another
-              </Button>
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <Button
-                onClick={() => onToggleFavorite(movie)}
-                variant={isFavorite ? "default" : "outline"}
-                className={`group font-semibold transition-all duration-300 transform hover:scale-105 ${isFavorite 
-                  ? "bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white border-0" 
-                  : "border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
-                }`}
-                size="lg"
-              >
-                <Heart className={`w-5 h-5 mr-2 transition-all duration-300 ${isFavorite ? "fill-current scale-110" : "group-hover:scale-125"}`} />
-                {isFavorite ? "💖 Remove from Favorites" : "🤍 Add to Favorites"}
-              </Button>
-              
-              <Button
-                onClick={() => {
-                  const imdbUrl = movie.imdb_id 
-                    ? `https://www.imdb.com/title/${movie.imdb_id}/`
-                    : `https://www.imdb.com/find?q=${encodeURIComponent(movie.title)}&ref_=nv_sr_sm`;
-                  window.open(imdbUrl, '_blank');
-                }}
-                variant="outline"
-                className="group border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white font-semibold transition-all duration-300 transform hover:scale-105"
-                size="lg"
-              >
-                <ExternalLink className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform duration-300" />
-                📝 View More on IMDB
-              </Button>
-            </div>
+          <div className="pt-2">
+            <TooltipProvider>
+              <div className="flex justify-center gap-3">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      onClick={() => onWatchTrailer(movie.title)}
+                      className="group bg-gradient-to-r from-cinema-gold to-cinema-gold/90 text-background hover:from-cinema-gold/90 hover:to-cinema-gold font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-2xl animate-glow-pulse"
+                      size="icon"
+                    >
+                      <Play className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Watch Trailer</p>
+                  </TooltipContent>
+                </Tooltip>
+                
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      onClick={onPickAnother}
+                      className="group bg-gradient-to-r from-cinema-gold to-cinema-gold/90 text-background hover:from-cinema-gold/90 hover:to-cinema-gold font-semibold transition-all duration-300 transform hover:scale-105"
+                      size="icon"
+                    >
+                      <RotateCcw className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Pick Another</p>
+                  </TooltipContent>
+                </Tooltip>
+                
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      onClick={() => onToggleFavorite(movie)}
+                      className={`group font-semibold transition-all duration-300 transform hover:scale-105 ${isFavorite 
+                        ? "bg-gradient-to-r from-cinema-red to-cinema-red/90 text-white hover:from-cinema-red/90 hover:to-cinema-red" 
+                        : "bg-gradient-to-r from-cinema-gold to-cinema-gold/90 text-background hover:from-cinema-gold/90 hover:to-cinema-gold"
+                      }`}
+                      size="icon"
+                    >
+                      <Heart className={`w-5 h-5 transition-all duration-300 ${isFavorite ? "fill-current scale-110" : "group-hover:scale-125"}`} />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{isFavorite ? "Remove from Favorites" : "Add to Favorites"}</p>
+                  </TooltipContent>
+                </Tooltip>
+                
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      onClick={() => {
+                        const imdbUrl = movie.imdb_id 
+                          ? `https://www.imdb.com/title/${movie.imdb_id}/`
+                          : `https://www.imdb.com/find?q=${encodeURIComponent(movie.title)}&ref_=nv_sr_sm`;
+                        window.open(imdbUrl, '_blank');
+                      }}
+                      className="group bg-gradient-to-r from-cinema-gold to-cinema-gold/90 text-background hover:from-cinema-gold/90 hover:to-cinema-gold font-semibold transition-all duration-300 transform hover:scale-105"
+                      size="icon"
+                    >
+                      <ExternalLink className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>View on IMDB</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+            </TooltipProvider>
           </div>
         </div>
       </div>
