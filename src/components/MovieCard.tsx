@@ -1,0 +1,240 @@
+import { Star, Clock, Calendar, Globe, Play, RotateCcw, Film, Heart, ExternalLink } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import OptimizedImage from "@/components/OptimizedImage";
+
+interface Genre {
+  id: number;
+  name: string;
+}
+
+interface Movie {
+  id: number;
+  title: string;
+  overview: string;
+  poster_path: string | null;
+  release_date: string;
+  vote_average: number;
+  runtime: number | null;
+  genres: Genre[];
+  original_language: string;
+  imdb_id?: string;
+}
+
+interface MovieCardProps {
+  movie: Movie;
+  onPickAnother: () => void;
+  onWatchTrailer: (movieTitle: string) => void;
+  onToggleFavorite: (movie: Movie) => void;
+  isFavorite: boolean;
+}
+
+const MovieCard = ({ movie, onPickAnother, onWatchTrailer, onToggleFavorite, isFavorite }: MovieCardProps) => {
+  const posterUrl = movie.poster_path 
+    ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+    : null;
+
+  const releaseYear = movie.release_date ? new Date(movie.release_date).getFullYear() : 'Unknown';
+  
+  const formatRuntime = (minutes: number | null) => {
+    if (!minutes) return '';
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+  };
+
+  const renderStars = (rating: number) => {
+    const stars = [];
+    const fullStars = Math.floor(rating / 2);
+    const hasHalfStar = (rating / 2) % 1 >= 0.5;
+    
+    for (let i = 0; i < 5; i++) {
+      if (i < fullStars) {
+        stars.push(<Star key={i} className="w-4 h-4 text-primary fill-current" />);
+      } else if (i === fullStars && hasHalfStar) {
+        stars.push(<Star key={i} className="w-4 h-4 text-primary fill-current opacity-50" />);
+      } else {
+        stars.push(<Star key={i} className="w-4 h-4 text-muted-foreground" />);
+      }
+    }
+    return stars;
+  };
+
+  const truncateOverview = (text: string, maxLength: number = 300) => {
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+  };
+
+  return (
+    <div className="card-cinema rounded-xl p-3 sm:p-4 md:p-6 lg:p-8 max-w-5xl mx-auto animate-fade-in-up">
+      <div className="grid lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 items-start">
+        {/* Movie Poster */}
+        <div className="relative group order-2 lg:order-1">
+          <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-cinema-dark to-background">
+            {posterUrl ? (
+              <OptimizedImage
+                src={posterUrl}
+                alt={`${movie.title} movie poster`}
+                className="w-full aspect-[2/3] object-cover transition-all duration-500 group-hover:scale-110"
+                loading="lazy"
+              />
+            ) : (
+              <div className="w-full aspect-[2/3] bg-secondary rounded-lg flex items-center justify-center">
+                <Film className="w-16 h-16 text-muted-foreground" />
+              </div>
+            )}
+            
+            {/* Overlay Effects */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500" />
+            <div className="absolute inset-0 bg-gradient-to-br from-cinema-gold/10 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500" />
+            
+            {/* Floating Rating Badge */}
+            <div className="absolute top-4 right-4 bg-background/90 backdrop-blur-md rounded-full px-3 py-1 flex items-center gap-1 transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 delay-100">
+              <Star className="w-3 h-3 text-cinema-gold fill-current" />
+              <span className="text-sm font-semibold text-foreground">{movie.vote_average.toFixed(1)}</span>
+            </div>
+          </div>
+          
+          {/* Glow Effect */}
+          <div className="absolute -inset-1 bg-gradient-to-r from-cinema-gold/20 to-cinema-red/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition-all duration-500 -z-10" />
+        </div>
+
+        {/* Movie Details */}
+        <div className="space-y-3 sm:space-y-4 lg:space-y-6 order-1 lg:order-2">
+          {/* Title with Enhanced Typography */}
+          <div className="space-y-2">
+            <h2 className="font-cinema text-3xl sm:text-4xl lg:text-5xl text-transparent bg-clip-text bg-gradient-to-r from-cinema-gold to-cinema-gold/80 leading-tight animate-slide-up">
+              {movie.title}
+            </h2>
+            <div className="h-1 w-20 bg-gradient-to-r from-cinema-gold to-transparent rounded-full animate-scale-in" />
+          </div>
+
+          {/* Enhanced Rating Display */}
+          <div className="flex items-center justify-between bg-secondary/50 backdrop-blur-sm rounded-xl p-4 border border-border/50">
+            <div className="flex items-center space-x-2">
+              <div className="flex space-x-1">
+                {renderStars(movie.vote_average)}
+              </div>
+              <span className="text-lg font-bold text-cinema-gold">
+                {movie.vote_average.toFixed(1)}/10
+              </span>
+            </div>
+            <div className="text-right">
+              <p className="text-xs text-muted-foreground uppercase tracking-wider">Rating</p>
+              <p className="text-sm font-medium">
+                {movie.vote_average >= 8 ? "Excellent" : 
+                 movie.vote_average >= 7 ? "Very Good" : 
+                 movie.vote_average >= 6 ? "Good" : "Average"}
+              </p>
+            </div>
+          </div>
+
+          {/* Enhanced Genre Tags */}
+          {movie.genres && movie.genres.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {movie.genres.map((genre, index) => (
+                <Badge 
+                  key={genre.id} 
+                  variant="secondary"
+                  className="bg-gradient-to-r from-cinema-dark to-secondary text-cinema-gold border border-cinema-gold/20 px-3 py-1 rounded-full text-sm font-medium hover:from-cinema-gold/10 hover:to-cinema-gold/5 transition-all duration-300 transform hover:scale-105"
+                  style={{
+                    animationDelay: `${index * 100}ms`,
+                    animation: 'slide-up 0.4s ease-out forwards'
+                  }}
+                >
+                  {genre.name}
+                </Badge>
+              ))}
+            </div>
+          )}
+
+          {/* Enhanced Overview */}
+          <div className="bg-background/30 backdrop-blur-sm rounded-xl p-4 border border-border/30">
+            <h3 className="text-sm font-cinema text-cinema-gold mb-2 uppercase tracking-wider">Synopsis</h3>
+            <p className="text-muted-foreground leading-relaxed text-sm sm:text-base">
+              {truncateOverview(movie.overview)}
+            </p>
+          </div>
+
+          {/* Enhanced Movie Info Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            <div className="bg-secondary/50 backdrop-blur-sm rounded-lg p-3 text-center border border-border/30 hover:border-cinema-gold/30 transition-all duration-300">
+              <Calendar className="w-4 h-4 mx-auto mb-1 text-cinema-gold" />
+              <p className="text-xs text-muted-foreground uppercase tracking-wider">Release</p>
+              <p className="text-sm font-semibold">{releaseYear}</p>
+            </div>
+            
+            {movie.runtime && (
+              <div className="bg-secondary/50 backdrop-blur-sm rounded-lg p-3 text-center border border-border/30 hover:border-cinema-gold/30 transition-all duration-300">
+                <Clock className="w-4 h-4 mx-auto mb-1 text-cinema-gold" />
+                <p className="text-xs text-muted-foreground uppercase tracking-wider">Runtime</p>
+                <p className="text-sm font-semibold">{formatRuntime(movie.runtime)}</p>
+              </div>
+            )}
+            
+            <div className="bg-secondary/50 backdrop-blur-sm rounded-lg p-3 text-center border border-border/30 hover:border-cinema-gold/30 transition-all duration-300">
+              <Globe className="w-4 h-4 mx-auto mb-1 text-cinema-gold" />
+              <p className="text-xs text-muted-foreground uppercase tracking-wider">Language</p>
+              <p className="text-sm font-semibold">{movie.original_language.toUpperCase()}</p>
+            </div>
+          </div>
+
+          {/* Enhanced Action Buttons */}
+          <div className="space-y-3 pt-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Button
+                onClick={() => onWatchTrailer(movie.title)}
+                className="group bg-gradient-to-r from-cinema-gold to-cinema-gold/90 text-background hover:from-cinema-gold/90 hover:to-cinema-gold font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-2xl animate-glow-pulse"
+                size="lg"
+              >
+                <Play className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform duration-300" />
+                🎥 Watch Trailer
+              </Button>
+              
+              <Button
+                onClick={onPickAnother}
+                variant="outline"
+                className="group border-2 border-cinema-gold text-cinema-gold hover:bg-cinema-gold hover:text-background font-semibold transition-all duration-300 transform hover:scale-105"
+                size="lg"
+              >
+                <RotateCcw className="w-5 h-5 mr-2 group-hover:rotate-180 transition-transform duration-500" />
+                🍿 Pick Another
+              </Button>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Button
+                onClick={() => onToggleFavorite(movie)}
+                variant={isFavorite ? "default" : "outline"}
+                className={`group font-semibold transition-all duration-300 transform hover:scale-105 ${isFavorite 
+                  ? "bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white border-0" 
+                  : "border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+                }`}
+                size="lg"
+              >
+                <Heart className={`w-5 h-5 mr-2 transition-all duration-300 ${isFavorite ? "fill-current scale-110" : "group-hover:scale-125"}`} />
+                {isFavorite ? "💖 Remove from Favorites" : "🤍 Add to Favorites"}
+              </Button>
+              
+              <Button
+                onClick={() => {
+                  const imdbUrl = movie.imdb_id 
+                    ? `https://www.imdb.com/title/${movie.imdb_id}/`
+                    : `https://www.imdb.com/find?q=${encodeURIComponent(movie.title)}&ref_=nv_sr_sm`;
+                  window.open(imdbUrl, '_blank');
+                }}
+                variant="outline"
+                className="group border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white font-semibold transition-all duration-300 transform hover:scale-105"
+                size="lg"
+              >
+                <ExternalLink className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform duration-300" />
+                📝 View More on IMDB
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default MovieCard;
