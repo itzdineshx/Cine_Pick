@@ -55,21 +55,65 @@ export class MovieService {
     }
   }
 
-  // Get random movie from results, excluding already shown movies
+  // Get random movie from results, excluding already shown movies with pagination
   static async getRandomMovie(filters?: Filters, excludeIds: number[] = []): Promise<Movie | null> {
     try {
-      const movies = await this.discoverMovies(filters)
-      const availableMovies = movies.filter(movie => !excludeIds.includes(movie.id))
+      // Get multiple random pages to increase variety
+      const randomPage = Math.floor(Math.random() * 10) + 1
+      const data = await ApiClient.call('discover', { 
+        filters: { 
+          ...filters, 
+          page: randomPage,
+          // Randomize sort order for more variety
+          sortBy: this.getRandomSortOrder()
+        } 
+      })
       
-      if (availableMovies.length === 0) {
+      if (!data.results || data.results.length === 0) {
         return null
       }
       
-      const randomIndex = Math.floor(Math.random() * availableMovies.length)
-      return availableMovies[randomIndex]
+      // Get detailed information for movies to ensure complete data
+      const randomMovies = this.shuffleArray(data.results.slice(0, 10))
+      
+      for (const movie of randomMovies) {
+        if (movie && typeof movie === 'object' && 'id' in movie) {
+          const movieId = (movie as any).id
+          if (!excludeIds.includes(movieId)) {
+            const details = await this.fetchMovieDetails(movieId)
+            if (details) {
+              return details
+            }
+          }
+        }
+      }
+      
+      return null
     } catch (error) {
       console.error('Error getting random movie:', error)
       return null
     }
+  }
+
+  // Helper method to randomize sort order for more variety
+  private static getRandomSortOrder(): string {
+    const sortOptions = [
+      'popularity.desc',
+      'vote_average.desc', 
+      'release_date.desc',
+      'vote_count.desc',
+      'revenue.desc'
+    ]
+    return sortOptions[Math.floor(Math.random() * sortOptions.length)]
+  }
+
+  // Fisher-Yates shuffle algorithm for true randomization
+  private static shuffleArray<T>(array: T[]): T[] {
+    const shuffled = [...array]
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+    }
+    return shuffled
   }
 }

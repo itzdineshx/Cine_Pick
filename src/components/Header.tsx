@@ -17,7 +17,11 @@ const Header = ({ onShowFilters, onScrollToSection, onShowFavorites, favoritesCo
           {/* Logo */}
           <div className="flex items-center space-x-2 sm:space-x-3">
             <div className="relative">
-              <Film className="w-6 h-6 sm:w-8 sm:h-8 text-primary animate-pulse-golden" />
+              <img 
+                src="/lovable-uploads/cf0d270f-9aec-4651-833c-f5afd0c0e03e.png" 
+                alt="CinePick Logo" 
+                className="w-6 h-6 sm:w-8 sm:h-8 object-contain"
+              />
             </div>
             <span className="font-cinema text-xl sm:text-2xl text-primary tracking-wider">
               CinePick
