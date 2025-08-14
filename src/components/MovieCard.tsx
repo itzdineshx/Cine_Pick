@@ -68,8 +68,8 @@ const MovieCard = ({ movie, onPickAnother, onWatchTrailer, onToggleFavorite, isF
   return (
     <div className="card-cinema rounded-xl p-3 sm:p-4 md:p-6 lg:p-8 max-w-5xl mx-auto animate-fade-in-up">
       <div className="grid lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 items-start">
-        {/* Movie Poster */}
-        <div className="relative group order-2 lg:order-1">
+        {/* Movie Poster - Desktop */}
+        <div className="relative group order-2 lg:order-1 hidden lg:block">
           <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-cinema-dark to-background">
             {posterUrl ? (
               <OptimizedImage
@@ -101,12 +101,35 @@ const MovieCard = ({ movie, onPickAnother, onWatchTrailer, onToggleFavorite, isF
 
         {/* Movie Details */}
         <div className="space-y-3 sm:space-y-4 lg:space-y-6 order-1 lg:order-2">
-          {/* Title with Enhanced Typography */}
+          {/* Title with Mobile Poster */}
           <div className="space-y-2">
-            <h2 className="font-cinema text-3xl sm:text-4xl lg:text-5xl text-transparent bg-clip-text bg-gradient-to-r from-cinema-gold to-cinema-gold/80 leading-tight animate-slide-up">
-              {movie.title}
-            </h2>
-            <div className="h-1 w-20 bg-gradient-to-r from-cinema-gold to-transparent rounded-full animate-scale-in" />
+            <div className="flex gap-4 items-start lg:block">
+              {/* Mobile Poster */}
+              <div className="relative group lg:hidden flex-shrink-0">
+                <div className="relative overflow-hidden rounded-lg bg-gradient-to-br from-cinema-dark to-background w-20 sm:w-24">
+                  {posterUrl ? (
+                    <OptimizedImage
+                      src={posterUrl}
+                      alt={`${movie.title} movie poster`}
+                      className="w-full aspect-[2/3] object-cover transition-all duration-500"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="w-full aspect-[2/3] bg-secondary rounded-lg flex items-center justify-center">
+                      <Film className="w-8 h-8 text-muted-foreground" />
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Title */}
+              <div className="flex-1 lg:w-full">
+                <h2 className="font-cinema text-2xl sm:text-3xl lg:text-5xl text-transparent bg-clip-text bg-gradient-to-r from-cinema-gold to-cinema-gold/80 leading-tight animate-slide-up">
+                  {movie.title}
+                </h2>
+                <div className="h-1 w-16 lg:w-20 bg-gradient-to-r from-cinema-gold to-transparent rounded-full animate-scale-in mt-2" />
+              </div>
+            </div>
           </div>
 
           {/* Enhanced Rating Display */}
