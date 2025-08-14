@@ -1,73 +1,33 @@
-# Welcome to your Lovable project
+# 🎬 CinePick
 
-## Project info
+CinePick is a **random movie recommendation web app** that helps you discover great films based on your preferences.  
+It uses **The Movie Database (TMDb) API** to fetch movie details and allows you to filter recommendations by genre, release year, and rating — or simply get a surprise pick.
 
-**URL**: https://lovable.dev/projects/86854fd3-1444-4e27-a973-e0ff8ecb6199
+---
 
-## How can I edit this code?
+## 🚀 Features
 
-There are several ways of editing your application.
+- 🎥 **Random Movie Picker** — Get a completely random movie with one click
+- 🎯 **Filter System** — Choose genres, release years, and minimum ratings
+- 🖼 **Movie Details** — See posters, descriptions, release dates, and ratings
+- 🔄 **No Repeats** — Avoid getting the same recommendation in a single session
+- 📱 **Responsive Design** — Works beautifully on desktop and mobile
+- 🌟 **Cinema-Themed UI** — Dark, cinematic look with gold and red accents
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/86854fd3-1444-4e27-a973-e0ff8ecb6199) and start prompting.
+## 🛠 Tech Overview
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Frontend:** HTML, CSS, JavaScript (SPA with smooth UI transitions)
+- **API:** [TMDb API](https://www.themoviedb.org/documentation/api)
+- **Styling:** Custom cinema-inspired theme with animations
+- **Hosting:** Any static hosting (Netlify, Vercel, GitHub Pages)
 
-**Use your preferred IDE**
+---
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 📦 Installation & Setup
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/86854fd3-1444-4e27-a973-e0ff8ecb6199) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+1. **Clone this repository**
+   ```bash
+   git clone https://github.com/yourusername/cinepick.git
+   cd cinepick
