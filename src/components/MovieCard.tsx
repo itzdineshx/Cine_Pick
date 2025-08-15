@@ -66,8 +66,8 @@ const MovieCard = ({ movie, onPickAnother, onWatchTrailer, onToggleFavorite, isF
   };
 
   return (
-    <div className="card-cinema rounded-xl p-3 sm:p-4 md:p-6 lg:p-8 max-w-5xl mx-auto animate-fade-in-up">
-      <div className="grid lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 items-start">
+    <div className="card-cinema rounded-xl p-3 sm:p-4 md:p-4 lg:p-5 max-w-4xl mx-auto animate-fade-in-up">
+      <div className="grid lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-5 items-start">
         {/* Movie Poster - Desktop */}
         <div className="relative group order-2 lg:order-1 hidden lg:block">
           <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-cinema-dark to-background">
