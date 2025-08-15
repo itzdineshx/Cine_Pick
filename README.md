@@ -50,14 +50,14 @@ Say goodbye to endlessly browsing through lists — CinePick finds great movies 
    * Go to settings → API → Generate key
    * Example:
 
-     * `API Key` → `ef27c42d7cb61ce7f383f99a10294657`
-     * `Bearer Token` → `eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJlZjI3Y...`
+     * `API Key` → `ef--------------57`
+     * `Bearer Token` → `ey--------------3Y...`
 
 4. **Create `.env` file**
 
    ```env
-   REACT_APP_TMDB_API_KEY=ef27c42d7cb61ce7f383f99a10294657
-   REACT_APP_TMDB_BEARER=eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJlZjI3YzQyZDdjYjYxY2U3ZjM4M2Y5OWExMDI5NDY1NyIsIm5iZiI6MTc1NDgyMjI5OS41ODIsInN1YiI6IjY4OTg3NjliZGM5MDAwNDc3Y2I2ZmFhMiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.lyqYbXcTkSlln7oDTiT6pWfxXb0kb-BCRfoKwQC7VSo
+   REACT_APP_TMDB_API_KEY=ef----------------------57
+   REACT_APP_TMDB_BEARER=ey----------------------------So
    ```
 
 5. **Run the app locally**
