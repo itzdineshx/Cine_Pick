@@ -1,4 +1,4 @@
-import { Film } from "lucide-react";
+import { Heart } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -16,6 +16,9 @@ const Footer = () => {
         <div className="space-y-1 sm:space-y-2 text-xs sm:text-sm text-muted-foreground">
           <p>&copy; 2025 CinePick. All rights reserved.</p>
           <p>Your next favorite film is just a click away.</p>
+          <p className="text-muted-foreground text-xs flex items-center justify-center gap-1">
+            Made with <Heart className="w-4 h-4 text-primary" /> for Movie lovers.
+          </p>
         </div>
       </div>
     </footer>

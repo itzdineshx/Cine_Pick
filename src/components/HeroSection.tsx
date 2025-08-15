@@ -43,7 +43,6 @@ const HeroSection = ({ onPickMovie, onShowFilters, isLoading }: HeroSectionProps
               size="lg"
               className="golden-glow bg-primary text-primary-foreground hover:bg-primary/90 px-8 sm:px-12 py-4 sm:py-6 text-lg sm:text-xl font-semibold transition-all duration-300 w-full max-w-xs sm:w-auto"
             >
-              <Play className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" />
               {isLoading ? 'Finding Your Movie...' : '🎬 Pick a Movie!'}
             </Button>
           </div>

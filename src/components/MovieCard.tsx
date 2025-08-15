@@ -1,4 +1,4 @@
-import { Star, Clock, Calendar, Globe, Play, RotateCcw, Film, Heart, ExternalLink } from "lucide-react";
+import { Star, Clock, Calendar, Globe, Play, RotateCcw, Film, Heart, ExternalLink, Clapperboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -66,7 +66,7 @@ const MovieCard = ({ movie, onPickAnother, onWatchTrailer, onToggleFavorite, isF
   };
 
   return (
-    <div className="card-cinema rounded-xl p-3 sm:p-4 md:p-4 lg:p-5 max-w-4xl mx-auto animate-fade-in-up">
+    <div className="card-cinema rounded-xl p-2 sm:p-2 md:p-4 lg:p-5 max-w-4xl mx-auto animate-fade-in-up ">
       <div className="grid lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-5 items-start">
         {/* Movie Poster - Desktop */}
         <div className="relative group order-2 lg:order-1 hidden lg:block">
@@ -91,7 +91,7 @@ const MovieCard = ({ movie, onPickAnother, onWatchTrailer, onToggleFavorite, isF
             {/* Spinning Film Reel Icon */}
             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500">
               <div className="bg-cinema-gold/90 backdrop-blur-md rounded-full p-4 transform scale-75 group-hover:scale-100 transition-all duration-500">
-                <Film className="w-12 h-12 text-background animate-spin" style={{ animation: 'spin 2s linear infinite' }} />
+                <Clapperboard className="w-12 h-12 text-background animate-spin" style={{ animation: 'spin 2s linear infinite' }} />
               </div>
             </div>
             
