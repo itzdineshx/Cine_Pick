@@ -113,7 +113,7 @@ const MovieCard = ({ movie, onPickAnother, onWatchTrailer, onToggleFavorite, isF
             <div className="flex gap-4 items-start lg:block">
               {/* Mobile Poster */}
               <div className="relative group lg:hidden flex-shrink-0">
-                <div className="relative overflow-hidden rounded-lg bg-gradient-to-br from-cinema-dark to-background w-20 sm:w-24">
+                <div className="relative overflow-hidden rounded-lg bg-gradient-to-br from-cinema-dark to-background w-28 sm:w-32">
                   {posterUrl ? (
                     <OptimizedImage
                       src={posterUrl}
