@@ -66,16 +66,16 @@ const MovieCard = ({ movie, onPickAnother, onWatchTrailer, onToggleFavorite, isF
   };
 
   return (
-    <div className="card-cinema rounded-xl p-4 sm:p-6 md:p-8 lg:p-10 max-w-6xl mx-auto animate-fade-in-up shadow-2xl">
-      <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-start">
+    <div className="card-cinema rounded-xl p-3 sm:p-4 md:p-6 lg:p-8 max-w-5xl mx-auto animate-fade-in-up">
+      <div className="grid lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 items-start">
         {/* Movie Poster - Desktop */}
         <div className="relative group order-2 lg:order-1 hidden lg:block">
-          <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-cinema-dark to-background shadow-xl">
+          <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-cinema-dark to-background">
             {posterUrl ? (
               <OptimizedImage
                 src={posterUrl}
                 alt={`${movie.title} movie poster`}
-                className="w-full aspect-[2/3] object-cover transition-all duration-700 ease-out group-hover:scale-125 group-hover:rotate-2"
+                className="w-full aspect-[2/3] object-cover transition-all duration-500 group-hover:scale-110"
                 loading="lazy"
               />
             ) : (
@@ -84,26 +84,19 @@ const MovieCard = ({ movie, onPickAnother, onWatchTrailer, onToggleFavorite, isF
               </div>
             )}
             
-            {/* Enhanced Overlay Effects */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-700" />
-            <div className="absolute inset-0 bg-gradient-to-br from-cinema-gold/20 via-transparent to-cinema-red/10 opacity-0 group-hover:opacity-100 transition-all duration-700" />
-            <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-cinema-gold/5 opacity-0 group-hover:opacity-100 transition-all duration-700" />
+            {/* Overlay Effects */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500" />
+            <div className="absolute inset-0 bg-gradient-to-br from-cinema-gold/10 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500" />
             
-            {/* Animated Floating Rating Badge */}
-            <div className="absolute top-4 right-4 bg-background/95 backdrop-blur-md rounded-full px-4 py-2 flex items-center gap-2 transform translate-y-4 scale-75 opacity-0 group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-500 delay-200 shadow-lg">
-              <Star className="w-4 h-4 text-cinema-gold fill-current animate-pulse" />
-              <span className="text-sm font-bold text-foreground">{movie.vote_average.toFixed(1)}</span>
-            </div>
-
-            {/* Shimmer Effect */}
-            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-              <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
+            {/* Floating Rating Badge */}
+            <div className="absolute top-4 right-4 bg-background/90 backdrop-blur-md rounded-full px-3 py-1 flex items-center gap-1 transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 delay-100">
+              <Star className="w-3 h-3 text-cinema-gold fill-current" />
+              <span className="text-sm font-semibold text-foreground">{movie.vote_average.toFixed(1)}</span>
             </div>
           </div>
           
-          {/* Enhanced Glow Effect */}
-          <div className="absolute -inset-2 bg-gradient-to-r from-cinema-gold/30 via-cinema-red/20 to-cinema-gold/30 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-700 -z-10 animate-pulse" />
-          <div className="absolute -inset-1 bg-gradient-to-r from-cinema-gold/40 to-cinema-red/40 rounded-xl blur opacity-0 group-hover:opacity-100 transition-all duration-500 -z-10" />
+          {/* Glow Effect */}
+          <div className="absolute -inset-1 bg-gradient-to-r from-cinema-gold/20 to-cinema-red/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition-all duration-500 -z-10" />
         </div>
 
         {/* Movie Details */}
