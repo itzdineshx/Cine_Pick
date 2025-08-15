@@ -1,5 +1,7 @@
 # 🎬 CinePick
+
 ![CinePick Screenshot](./CinePick-logo2.png)
+
 CinePick is a yellow-and-black themed movie recommendation app powered by **The Movie Database (TMDb) API**.  
 Say goodbye to endlessly browsing through lists — CinePick finds great movies for you with a single click.
 
