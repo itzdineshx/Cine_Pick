@@ -88,6 +88,13 @@ const MovieCard = ({ movie, onPickAnother, onWatchTrailer, onToggleFavorite, isF
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500" />
             <div className="absolute inset-0 bg-gradient-to-br from-cinema-gold/10 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500" />
             
+            {/* Spinning Film Reel Icon */}
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500">
+              <div className="bg-cinema-gold/90 backdrop-blur-md rounded-full p-4 transform scale-75 group-hover:scale-100 transition-all duration-500">
+                <Film className="w-12 h-12 text-background animate-spin" style={{ animation: 'spin 2s linear infinite' }} />
+              </div>
+            </div>
+            
             {/* Floating Rating Badge */}
             <div className="absolute top-4 right-4 bg-background/90 backdrop-blur-md rounded-full px-3 py-1 flex items-center gap-1 transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 delay-100">
               <Star className="w-3 h-3 text-cinema-gold fill-current" />
