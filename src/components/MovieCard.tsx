@@ -66,8 +66,8 @@ const MovieCard = ({ movie, onPickAnother, onWatchTrailer, onToggleFavorite, isF
   };
 
   return (
-    <div className="card-cinema rounded-xl p-4 sm:p-6 md:p-8 lg:p-12 max-w-7xl mx-auto animate-fade-in-up shadow-2xl">
-      <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-16 items-start">
+    <div className="card-cinema rounded-xl p-4 sm:p-6 md:p-8 lg:p-10 max-w-6xl mx-auto animate-fade-in-up shadow-2xl">
+      <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-start">
         {/* Movie Poster - Desktop */}
         <div className="relative group order-2 lg:order-1 hidden lg:block">
           <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-cinema-dark to-background shadow-xl">
@@ -113,7 +113,7 @@ const MovieCard = ({ movie, onPickAnother, onWatchTrailer, onToggleFavorite, isF
             <div className="flex gap-4 items-start lg:block">
               {/* Mobile Poster */}
               <div className="relative group lg:hidden flex-shrink-0">
-                <div className="relative overflow-hidden rounded-lg bg-gradient-to-br from-cinema-dark to-background w-28 sm:w-32 md:w-36">
+                <div className="relative overflow-hidden rounded-lg bg-gradient-to-br from-cinema-dark to-background w-20 sm:w-24">
                   {posterUrl ? (
                     <OptimizedImage
                       src={posterUrl}
