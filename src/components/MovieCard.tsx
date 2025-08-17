@@ -1,8 +1,15 @@
-import { Star, Clock, Calendar, Globe, Play, RotateCcw, Film, Heart, ExternalLink, Clapperboard } from "lucide-react";
+import { useState } from "react";
+import { Star, Clock, Calendar, Globe, Play, RotateCcw, Film, Heart, ExternalLink, Clapperboard, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import OptimizedImage from "@/components/OptimizedImage";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface Genre {
   id: number;
@@ -25,12 +32,16 @@ interface Movie {
 interface MovieCardProps {
   movie: Movie;
   onPickAnother: () => void;
-  onWatchTrailer: (movieTitle: string) => void;
+  onWatchTrailer: (movieTitle: string) => Promise<string> | string;
   onToggleFavorite: (movie: Movie) => void;
   isFavorite: boolean;
 }
 
 const MovieCard = ({ movie, onPickAnother, onWatchTrailer, onToggleFavorite, isFavorite }: MovieCardProps) => {
+  const [showTrailer, setShowTrailer] = useState(false);
+  const [trailerUrl, setTrailerUrl] = useState<string>("");
+  const [isLoadingTrailer, setIsLoadingTrailer] = useState(false);
+
   const posterUrl = movie.poster_path 
     ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
     : null;
@@ -65,8 +76,87 @@ const MovieCard = ({ movie, onPickAnother, onWatchTrailer, onToggleFavorite, isF
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
   };
 
+  const handleWatchTrailer = async () => {
+    setIsLoadingTrailer(true);
+    try {
+      const url = await onWatchTrailer(movie.title);
+      if (url) {
+        // Convert YouTube watch URL to embed URL
+        let embedUrl = url;
+        if (url.includes('youtube.com/watch?v=')) {
+          const videoId = url.split('v=')[1].split('&')[0];
+          embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+        } else if (url.includes('youtu.be/')) {
+          const videoId = url.split('youtu.be/')[1].split('?')[0];
+          embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+        }
+        setTrailerUrl(embedUrl);
+        setShowTrailer(true);
+      }
+    } catch (error) {
+      console.error('Failed to load trailer:', error);
+    } finally {
+      setIsLoadingTrailer(false);
+    }
+  };
+
+  const closeTrailer = () => {
+    setShowTrailer(false);
+    setTrailerUrl("");
+  };
+
+  const handleExternalLink = (platform: 'imdb' | 'letterboxd') => {
+    if (platform === 'imdb') {
+      const imdbUrl = movie.imdb_id 
+        ? `https://www.imdb.com/title/${movie.imdb_id}/`
+        : `https://www.imdb.com/find?q=${encodeURIComponent(movie.title)}&ref_=nv_sr_sm`;
+      window.open(imdbUrl, '_blank');
+    } else if (platform === 'letterboxd') {
+      // Convert movie title to Letterboxd slug format
+      const slug = movie.title
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+        .replace(/\s+/g, '-') // Replace spaces with hyphens
+        .replace(/-+/g, '-') // Replace multiple hyphens with single
+        .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+      
+      const letterboxdUrl = `https://letterboxd.com/film/${slug}/`;
+      window.open(letterboxdUrl, '_blank');
+    }
+  };
+
   return (
-    <div className="card-cinema rounded-xl p-2 sm:p-2 md:p-4 lg:p-5 max-w-4xl mx-auto animate-fade-in-up ">
+    <div className="card-cinema rounded-xl p-2 sm:p-2 md:p-4 lg:p-5 max-w-4xl mx-auto animate-fade-in-up">
+      {/* Trailer Modal Overlay */}
+      {showTrailer && (
+        <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="relative w-full max-w-4xl aspect-video">
+            {/* Glowing Border Effect */}
+            <div className="absolute -inset-1 bg-gradient-to-r from-cinema-gold/50 to-cinema-gold/30 rounded-xl blur-sm animate-pulse" />
+            
+            {/* Trailer Container */}
+            <div className="relative bg-black rounded-xl overflow-hidden border-2 border-cinema-gold/20">
+              <iframe
+                src={trailerUrl}
+                title={`${movie.title} Trailer`}
+                className="w-full aspect-video"
+                allowFullScreen
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              />
+              
+              {/* Close Button */}
+              <Button
+                onClick={closeTrailer}
+                className="absolute top-4 right-4 bg-cinema-gold/90 hover:bg-cinema-gold text-background rounded-full p-2 transition-all duration-300 transform hover:scale-110"
+                size="icon"
+              >
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="grid lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-5 items-start">
         {/* Movie Poster - Desktop */}
         <div className="relative group order-2 lg:order-1 hidden lg:block">
@@ -216,15 +306,20 @@ const MovieCard = ({ movie, onPickAnother, onWatchTrailer, onToggleFavorite, isF
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
-                      onClick={() => onWatchTrailer(movie.title)}
-                      className="group bg-gradient-to-r from-cinema-gold to-cinema-gold/90 text-background hover:from-cinema-gold/90 hover:to-cinema-gold font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-2xl animate-glow-pulse"
+                      onClick={handleWatchTrailer}
+                      disabled={isLoadingTrailer}
+                      className="group bg-gradient-to-r from-cinema-gold to-cinema-gold/90 text-background hover:from-cinema-gold/90 hover:to-cinema-gold font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-2xl animate-glow-pulse disabled:opacity-50 disabled:cursor-not-allowed"
                       size="icon"
                     >
-                      <Play className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
+                      {isLoadingTrailer ? (
+                        <div className="w-5 h-5 border-2 border-background border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <Play className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
+                      )}
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Watch Trailer</p>
+                    <p>{isLoadingTrailer ? "Loading..." : "Watch Trailer"}</p>
                   </TooltipContent>
                 </Tooltip>
                 
@@ -261,25 +356,39 @@ const MovieCard = ({ movie, onPickAnother, onWatchTrailer, onToggleFavorite, isF
                   </TooltipContent>
                 </Tooltip>
                 
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      onClick={() => {
-                        const imdbUrl = movie.imdb_id 
-                          ? `https://www.imdb.com/title/${movie.imdb_id}/`
-                          : `https://www.imdb.com/find?q=${encodeURIComponent(movie.title)}&ref_=nv_sr_sm`;
-                        window.open(imdbUrl, '_blank');
-                      }}
-                      className="group bg-gradient-to-r from-cinema-gold to-cinema-gold/90 text-background hover:from-cinema-gold/90 hover:to-cinema-gold font-semibold transition-all duration-300 transform hover:scale-105"
-                      size="icon"
+                <DropdownMenu>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          className="group bg-gradient-to-r from-cinema-gold to-cinema-gold/90 text-background hover:from-cinema-gold/90 hover:to-cinema-gold font-semibold transition-all duration-300 transform hover:scale-105"
+                          size="icon"
+                        >
+                          <ExternalLink className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>External Links</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem 
+                      onClick={() => handleExternalLink('imdb')}
+                      className="cursor-pointer"
                     >
-                      <ExternalLink className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>View on IMDB</p>
-                  </TooltipContent>
-                </Tooltip>
+                      <ExternalLink className="w-4 h-4 mr-2" />
+                      View on IMDb
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={() => handleExternalLink('letterboxd')}
+                      className="cursor-pointer"
+                    >
+                      <ExternalLink className="w-4 h-4 mr-2" />
+                      View on Letterboxd
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </TooltipProvider>
           </div>
