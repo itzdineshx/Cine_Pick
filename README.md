@@ -1,6 +1,16 @@
 # 🎬 CinePick
 
-![CinePick Screenshot](./cinepick-logo2.png)
+![CinePick Screenshot](./cinepick.png)
+
+
+<div align="center">
+
+[![View Site](https://img.shields.io/badge/View_Live_Site-D19D00?style=for-the-badge&logo=netlify&logoColor=white)](https://cinempick.netlify.app/)
+
+![IMDb API](https://img.shields.io/badge/IMDb-API-F5C518?logo=imdb&logoColor=black&labelColor=1B1F23&style=flat-square)
+![API Status](https://img.shields.io/website?url=https%3A%2F%2Fimdb-api.com&label=IMDb%20API&style=flat-square)
+
+</div>
 
 CinePick is a yellow-and-black themed movie recommendation app powered by **The Movie Database (TMDb) API**.  
 Say goodbye to endlessly browsing through lists — CinePick finds great movies for you with a single click.
@@ -16,10 +26,6 @@ Say goodbye to endlessly browsing through lists — CinePick finds great movies 
 - ❤️ **Favorites** – Save movies you love to watch later.
 - 🔍 **Filtering** – Filter by genre, year, or rating.
 
----
-
-## 🖼 Preview
-![CinePick Screenshot](./cinepick.png)
 
 ---
 
@@ -86,4 +92,7 @@ This project is licensed under the MIT License.
 
 * **TMDb API** for movie data and posters.
 * **Google Fonts** for typography.
-* **Design inspiration** from SugoiPick & MeloPick for consistent branding.
+* **Brand Family** – CinePick is part of the “Pick” brand alongside AniePick and MeloPick.
+
+
+![CinePick Screenshot](./cinepick-logo2.png)
