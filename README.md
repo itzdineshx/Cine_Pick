@@ -2,7 +2,6 @@
 
 ![CinePick Screenshot](./cinepick.png)
 
-
 <div align="center">
 
 [![View Site](https://img.shields.io/badge/View_Live_Site-D19D00?style=for-the-badge&logo=netlify&logoColor=white)](https://cinempick.netlify.app/)
