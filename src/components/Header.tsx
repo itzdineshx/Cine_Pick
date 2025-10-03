@@ -1,4 +1,4 @@
-import { Film, Filter, Home, Info, Heart } from "lucide-react";
+import { Film, Filter, Home, Info, Heart, Swords } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -48,6 +48,16 @@ const Header = ({ onShowFilters, onScrollToSection, onShowFavorites, favoritesCo
             >
               <Filter className="w-4 h-4 sm:mr-2" />
               <span className="hidden sm:inline">Filters</span>
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => window.location.href = '/battle'}
+              className="text-foreground hover:text-primary transition-colors"
+            >
+              <Swords className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Battle</span>
             </Button>
             
             <Button

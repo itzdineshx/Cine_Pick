@@ -124,7 +124,7 @@ const Index = () => {
 
   const handleWatchTrailer = (movieTitle: string) => {
     const trailerUrl = getTrailerUrl(movieTitle);
-    window.open(trailerUrl, '_blank', 'noopener,noreferrer');
+    return trailerUrl;
   };
 
   const handleToggleFavorite = (movie: Movie) => {
