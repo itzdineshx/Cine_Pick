@@ -2,9 +2,10 @@ import { useState, useRef } from "react";
 import { ArrowLeft, Download, Share2, Trophy, Swords } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { discoverMovies, type Movie } from "@/services/tmdb";
+import { type Movie } from "@/services/tmdb";
 import BattleMovieSelector from "@/components/BattleMovieSelector";
 import BattleResult from "@/components/BattleResult";
+import { BattleService, type DetailedMovieData, type ComparisonMetrics } from "@/services/battle-service";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
@@ -14,6 +15,10 @@ const Battle = () => {
   const [movie2, setMovie2] = useState<Movie | null>(null);
   const [winner, setWinner] = useState<Movie | null>(null);
   const [showResult, setShowResult] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [detailedData1, setDetailedData1] = useState<DetailedMovieData | undefined>();
+  const [detailedData2, setDetailedData2] = useState<DetailedMovieData | undefined>();
+  const [metrics, setMetrics] = useState<ComparisonMetrics | undefined>();
   const resultRef = useRef<HTMLDivElement>(null);
 
   const handleMovieSelect = (movieNumber: 1 | 2, movie: Movie) => {
@@ -26,22 +31,69 @@ const Battle = () => {
     setWinner(null);
   };
 
-  const handleBattle = (selectedWinner: Movie) => {
-    setWinner(selectedWinner);
-    setShowResult(true);
+  const handleBattle = async (userChoice: Movie) => {
+    if (!movie1 || !movie2) return;
+    
+    setIsProcessing(true);
+    
+    try {
+      toast({
+        title: "Analyzing movies...",
+        description: "Fetching detailed data from TMDb and other sources",
+      });
+
+      // Fetch detailed data for both movies
+      const [data1, data2] = await Promise.all([
+        BattleService.fetchDetailedMovieData(movie1.id),
+        BattleService.fetchDetailedMovieData(movie2.id)
+      ]);
+
+      setDetailedData1(data1);
+      setDetailedData2(data2);
+
+      // Calculate comparison metrics
+      const comparisonMetrics = BattleService.compareMovies(movie1, movie2, data1, data2);
+      setMetrics(comparisonMetrics);
+
+      // Use user's choice as the winner
+      setWinner(userChoice);
+      setShowResult(true);
+
+      toast({
+        title: "Battle Complete!",
+        description: `${userChoice.title} has been crowned the winner!`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch movie data. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const handleDownloadImage = async () => {
-    if (!resultRef.current) return;
+    if (!resultRef.current || !movie1 || !movie2) return;
     
     try {
+      toast({
+        title: "Generating image...",
+        description: "Please wait while we create your battle result",
+      });
+
       const canvas = await html2canvas(resultRef.current, {
         backgroundColor: '#000000',
         scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        logging: false,
       });
       
       const link = document.createElement('a');
-      link.download = `cinepick-battle-${Date.now()}.png`;
+      const fileName = `cinepick-battle-${movie1.title.replace(/[^a-z0-9]/gi, '-')}-vs-${movie2.title.replace(/[^a-z0-9]/gi, '-')}.png`;
+      link.download = fileName;
       link.href = canvas.toDataURL('image/png');
       link.click();
       
@@ -50,21 +102,30 @@ const Battle = () => {
         description: "Battle result downloaded as image",
       });
     } catch (error) {
+      console.error('Download error:', error);
       toast({
         title: "Error",
-        description: "Failed to download image",
+        description: "Failed to download image. Please try again.",
         variant: "destructive",
       });
     }
   };
 
   const handleDownloadPDF = async () => {
-    if (!resultRef.current) return;
+    if (!resultRef.current || !movie1 || !movie2) return;
     
     try {
+      toast({
+        title: "Generating PDF...",
+        description: "Please wait while we create your battle result",
+      });
+
       const canvas = await html2canvas(resultRef.current, {
         backgroundColor: '#000000',
         scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        logging: false,
       });
       
       const imgData = canvas.toDataURL('image/png');
@@ -75,30 +136,39 @@ const Battle = () => {
       });
       
       pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-      pdf.save(`cinepick-battle-${Date.now()}.pdf`);
+      const fileName = `cinepick-battle-${movie1.title.replace(/[^a-z0-9]/gi, '-')}-vs-${movie2.title.replace(/[^a-z0-9]/gi, '-')}.pdf`;
+      pdf.save(fileName);
       
       toast({
         title: "Success!",
         description: "Battle result downloaded as PDF",
       });
     } catch (error) {
+      console.error('Download error:', error);
       toast({
         title: "Error",
-        description: "Failed to download PDF",
+        description: "Failed to download PDF. Please try again.",
         variant: "destructive",
       });
     }
   };
 
   const handleShare = async () => {
-    const shareUrl = `${window.location.origin}/battle?m1=${movie1?.id}&m2=${movie2?.id}&winner=${winner?.id}`;
+    if (!movie1 || !movie2 || !winner) return;
+
+    const shareUrl = `${window.location.origin}/battle?m1=${movie1.id}&m2=${movie2.id}&winner=${winner.id}`;
+    const shareText = `🎬 CinePick Battle: ${movie1.title} vs ${movie2.title}\n🏆 Winner: ${winner.title}!\n\nCompare your favorite movies on CinePick!`;
     
     if (navigator.share) {
       try {
         await navigator.share({
           title: 'CinePick Battle Result',
-          text: `${winner?.title} wins the battle!`,
+          text: shareText,
           url: shareUrl,
+        });
+        toast({
+          title: "Shared!",
+          description: "Battle result shared successfully",
         });
       } catch (error) {
         if ((error as Error).name !== 'AbortError') {
@@ -131,6 +201,9 @@ const Battle = () => {
     setMovie2(null);
     setWinner(null);
     setShowResult(false);
+    setDetailedData1(undefined);
+    setDetailedData2(undefined);
+    setMetrics(undefined);
   };
 
   return (
@@ -201,6 +274,9 @@ const Battle = () => {
                 movie1={movie1!}
                 movie2={movie2!}
                 winner={winner!}
+                detailedData1={detailedData1}
+                detailedData2={detailedData2}
+                metrics={metrics}
               />
             </div>
           )}
@@ -210,17 +286,19 @@ const Battle = () => {
             <div className="flex justify-center gap-4 mt-8">
               <Button
                 onClick={() => handleBattle(movie1)}
+                disabled={isProcessing}
                 className="bg-gradient-to-r from-cinema-gold to-cinema-gold/90 text-background hover:from-cinema-gold/90 hover:to-cinema-gold font-semibold px-8"
               >
                 <Trophy className="w-5 h-5 mr-2" />
-                Choose {movie1.title}
+                {isProcessing ? "Analyzing..." : `Choose ${movie1.title}`}
               </Button>
               <Button
                 onClick={() => handleBattle(movie2)}
+                disabled={isProcessing}
                 className="bg-gradient-to-r from-cinema-gold to-cinema-gold/90 text-background hover:from-cinema-gold/90 hover:to-cinema-gold font-semibold px-8"
               >
                 <Trophy className="w-5 h-5 mr-2" />
-                Choose {movie2.title}
+                {isProcessing ? "Analyzing..." : `Choose ${movie2.title}`}
               </Button>
             </div>
           )}
