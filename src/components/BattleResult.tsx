@@ -1,6 +1,5 @@
-import { Trophy, Star, Calendar, Clock, Film, DollarSign, TrendingUp, Users, Award, Video, ThumbsUp, BarChart3, Percent, CheckCircle2, XCircle } from "lucide-react";
+import { Trophy, Star, Calendar, Clock, Film, DollarSign, TrendingUp, Users, Award, Video, ThumbsUp, BarChart3, Percent, CheckCircle2, XCircle, Timer } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import OptimizedImage from "@/components/OptimizedImage";
 import type { Movie } from "@/services/tmdb";
 import type { DetailedMovieData, ComparisonMetrics } from "@/services/battle-service";
@@ -23,7 +22,7 @@ const BattleResult = ({ movie1, movie2, winner, detailedData1, detailedData2, me
   };
 
   const formatCurrency = (amount: number | null) => {
-    if (!amount) return 'N/A';
+    if (!amount || amount === 0) return 'N/A';
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
@@ -32,9 +31,14 @@ const BattleResult = ({ movie1, movie2, winner, detailedData1, detailedData2, me
     }).format(amount);
   };
 
-  const formatNumber = (num: number | null) => {
-    if (!num) return 'N/A';
+  const formatNumber = (num: number | null | undefined) => {
+    if (num === null || num === undefined || num === 0) return '0';
     return new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(num);
+  };
+
+  const getYear = (dateString: string | null | undefined) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).getFullYear().toString();
   };
 
   // Calculate win counts for summary
@@ -49,6 +53,7 @@ const BattleResult = ({ movie1, movie2, winner, detailedData1, detailedData2, me
     if (metrics.revenueScore > 0) movie1Wins++; else if (metrics.revenueScore < 0) movie2Wins++;
     if (metrics.budgetScore > 0) movie1Wins++; else if (metrics.budgetScore < 0) movie2Wins++;
     if (metrics.castSizeScore > 0) movie1Wins++; else if (metrics.castSizeScore < 0) movie2Wins++;
+    if (metrics.runtimeScore > 0) movie1Wins++; else if (metrics.runtimeScore < 0) movie2Wins++;
     
     return { movie1Wins, movie2Wins };
   };
@@ -67,7 +72,7 @@ const BattleResult = ({ movie1, movie2, winner, detailedData1, detailedData2, me
     icon: React.ElementType;
     value1: number | null; 
     value2: number | null;
-    format?: 'number' | 'currency' | 'percent' | 'raw';
+    format?: 'number' | 'currency' | 'percent' | 'raw' | 'runtime';
     higherIsBetter?: boolean;
   }) => {
     const v1 = value1 || 0;
@@ -86,6 +91,7 @@ const BattleResult = ({ movie1, movie2, winner, detailedData1, detailedData2, me
         case 'currency': return formatCurrency(val);
         case 'percent': return `${val.toFixed(1)}%`;
         case 'raw': return val.toFixed(1);
+        case 'runtime': return formatRuntime(val);
         default: return formatNumber(val);
       }
     };
@@ -336,6 +342,14 @@ const BattleResult = ({ movie1, movie2, winner, detailedData1, detailedData2, me
           )}
           
           <MetricComparisonBar 
+            label="Runtime" 
+            icon={Timer}
+            value1={detailedData1?.runtime || 0} 
+            value2={detailedData2?.runtime || 0}
+            format="runtime"
+          />
+          
+          <MetricComparisonBar 
             label="Cast Size" 
             icon={Users}
             value1={detailedData1?.cast?.length || 0} 
@@ -368,10 +382,12 @@ const BattleResult = ({ movie1, movie2, winner, detailedData1, detailedData2, me
           </h4>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between"><span className="text-muted-foreground">TMDb Rating</span><span>{movie1.vote_average.toFixed(1)}/10</span></div>
-            <div className="flex justify-between"><span className="text-muted-foreground">Vote Count</span><span>{formatNumber(detailedData1?.vote_count || 0)}</span></div>
-            <div className="flex justify-between"><span className="text-muted-foreground">Popularity</span><span>{detailedData1?.popularity?.toFixed(0) || 'N/A'}</span></div>
-            <div className="flex justify-between"><span className="text-muted-foreground">Budget</span><span>{formatCurrency(detailedData1?.budget || 0)}</span></div>
-            <div className="flex justify-between"><span className="text-muted-foreground">Revenue</span><span>{formatCurrency(detailedData1?.revenue || 0)}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Vote Count</span><span>{formatNumber(detailedData1?.vote_count)}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Popularity</span><span>{detailedData1?.popularity?.toFixed(0) || '0'}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Release Year</span><span>{getYear(detailedData1?.release_date)}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Runtime</span><span>{formatRuntime(detailedData1?.runtime || null)}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Budget</span><span>{formatCurrency(detailedData1?.budget || null)}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Revenue</span><span>{formatCurrency(detailedData1?.revenue || null)}</span></div>
             {detailedData1?.imdb_id && <div className="flex justify-between"><span className="text-muted-foreground">IMDb ID</span><span className="text-yellow-500">{detailedData1.imdb_id}</span></div>}
             <div className="flex justify-between"><span className="text-muted-foreground">Cast Members</span><span>{detailedData1?.cast?.length || 0}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Trailers</span><span>{detailedData1?.videos?.length || 0}</span></div>
@@ -386,10 +402,12 @@ const BattleResult = ({ movie1, movie2, winner, detailedData1, detailedData2, me
           </h4>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between"><span className="text-muted-foreground">TMDb Rating</span><span>{movie2.vote_average.toFixed(1)}/10</span></div>
-            <div className="flex justify-between"><span className="text-muted-foreground">Vote Count</span><span>{formatNumber(detailedData2?.vote_count || 0)}</span></div>
-            <div className="flex justify-between"><span className="text-muted-foreground">Popularity</span><span>{detailedData2?.popularity?.toFixed(0) || 'N/A'}</span></div>
-            <div className="flex justify-between"><span className="text-muted-foreground">Budget</span><span>{formatCurrency(detailedData2?.budget || 0)}</span></div>
-            <div className="flex justify-between"><span className="text-muted-foreground">Revenue</span><span>{formatCurrency(detailedData2?.revenue || 0)}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Vote Count</span><span>{formatNumber(detailedData2?.vote_count)}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Popularity</span><span>{detailedData2?.popularity?.toFixed(0) || '0'}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Release Year</span><span>{getYear(detailedData2?.release_date)}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Runtime</span><span>{formatRuntime(detailedData2?.runtime || null)}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Budget</span><span>{formatCurrency(detailedData2?.budget || null)}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Revenue</span><span>{formatCurrency(detailedData2?.revenue || null)}</span></div>
             {detailedData2?.imdb_id && <div className="flex justify-between"><span className="text-muted-foreground">IMDb ID</span><span className="text-yellow-500">{detailedData2.imdb_id}</span></div>}
             <div className="flex justify-between"><span className="text-muted-foreground">Cast Members</span><span>{detailedData2?.cast?.length || 0}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Trailers</span><span>{detailedData2?.videos?.length || 0}</span></div>
