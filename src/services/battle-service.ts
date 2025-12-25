@@ -76,14 +76,22 @@ export class BattleService {
     // Cast size score
     const castSizeScore = data1.cast.length - data2.cast.length;
 
-    // Calculate total weighted score
+    // Calculate total weighted score with improved algorithm
+    // Weights: Rating 40%, Popularity 15%, Vote Count 15%, Revenue 15%, Budget 10%, Cast 5%
+    const normalizedRating = ratingScore / 10; // -1 to 1
+    const normalizedPopularity = popularityScore / Math.max(data1.popularity, data2.popularity, 1);
+    const normalizedVotes = voteCountScore / Math.max(data1.vote_count, data2.vote_count, 1);
+    const normalizedRevenue = revenueScore / Math.max(data1.revenue || 1, data2.revenue || 1, 1);
+    const normalizedBudget = budgetScore / Math.max(data1.budget || 1, data2.budget || 1, 1);
+    const normalizedCast = castSizeScore / Math.max(data1.cast.length, data2.cast.length, 1);
+
     const totalScore =
-      ratingScore * 2 + // Rating is most important
-      (popularityScore / 100) + // Normalize popularity
-      (voteCountScore / 1000) + // Normalize vote count
-      (revenueScore / 100000000) + // Normalize revenue
-      (budgetScore / 50000000) + // Normalize budget
-      castSizeScore * 0.5; // Cast size has small weight
+      normalizedRating * 40 +
+      normalizedPopularity * 15 +
+      normalizedVotes * 15 +
+      normalizedRevenue * 15 +
+      normalizedBudget * 10 +
+      normalizedCast * 5;
 
     return {
       ratingScore,

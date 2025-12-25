@@ -31,7 +31,7 @@ const Battle = () => {
     setWinner(null);
   };
 
-  const handleBattle = async (userChoice: Movie) => {
+  const handleBattle = async () => {
     if (!movie1 || !movie2) return;
     
     setIsProcessing(true);
@@ -39,7 +39,7 @@ const Battle = () => {
     try {
       toast({
         title: "Analyzing movies...",
-        description: "Fetching detailed data from TMDb and other sources",
+        description: "Fetching detailed data from TMDb, IMDb and comparing metrics",
       });
 
       // Fetch detailed data for both movies
@@ -55,13 +55,14 @@ const Battle = () => {
       const comparisonMetrics = BattleService.compareMovies(movie1, movie2, data1, data2);
       setMetrics(comparisonMetrics);
 
-      // Use user's choice as the winner
-      setWinner(userChoice);
+      // Determine winner algorithmically based on metrics
+      const algorithmicWinner = BattleService.determineWinner(movie1, movie2, data1, data2);
+      setWinner(algorithmicWinner);
       setShowResult(true);
 
       toast({
         title: "Battle Complete!",
-        description: `${userChoice.title} has been crowned the winner!`,
+        description: `${algorithmicWinner.title} wins based on comprehensive analysis!`,
       });
     } catch (error) {
       toast({
@@ -283,22 +284,15 @@ const Battle = () => {
 
           {/* Action Buttons */}
           {movie1 && movie2 && !showResult && (
-            <div className="flex justify-center gap-4 mt-8">
+            <div className="flex justify-center mt-8">
               <Button
-                onClick={() => handleBattle(movie1)}
+                onClick={handleBattle}
                 disabled={isProcessing}
-                className="bg-gradient-to-r from-cinema-gold to-cinema-gold/90 text-background hover:from-cinema-gold/90 hover:to-cinema-gold font-semibold px-8"
+                size="lg"
+                className="bg-gradient-to-r from-cinema-gold to-cinema-gold/90 text-background hover:from-cinema-gold/90 hover:to-cinema-gold font-semibold px-12 py-6 text-lg"
               >
-                <Trophy className="w-5 h-5 mr-2" />
-                {isProcessing ? "Analyzing..." : `Choose ${movie1.title}`}
-              </Button>
-              <Button
-                onClick={() => handleBattle(movie2)}
-                disabled={isProcessing}
-                className="bg-gradient-to-r from-cinema-gold to-cinema-gold/90 text-background hover:from-cinema-gold/90 hover:to-cinema-gold font-semibold px-8"
-              >
-                <Trophy className="w-5 h-5 mr-2" />
-                {isProcessing ? "Analyzing..." : `Choose ${movie2.title}`}
+                <Swords className="w-6 h-6 mr-3" />
+                {isProcessing ? "Analyzing & Comparing..." : "Start Battle"}
               </Button>
             </div>
           )}
