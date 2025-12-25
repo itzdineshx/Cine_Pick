@@ -9,6 +9,8 @@ export interface DetailedMovieData {
   popularity: number;
   vote_count: number;
   imdb_id?: string;
+  runtime: number | null;
+  release_date: string | null;
 }
 
 export interface ComparisonMetrics {
@@ -18,16 +20,18 @@ export interface ComparisonMetrics {
   revenueScore: number;
   budgetScore: number;
   castSizeScore: number;
+  runtimeScore: number;
   totalScore: number;
 }
 
 export class BattleService {
   static async fetchDetailedMovieData(movieId: number): Promise<DetailedMovieData> {
     try {
+      // Use correct action names that match the fallback switch cases
       const [movieDetails, credits, videos] = await Promise.all([
         ApiClient.call('movie-details', { movieId }),
-        ApiClient.call('movie-credits', { movieId }),
-        ApiClient.call('movie-videos', { movieId })
+        ApiClient.call('credits', { movieId }),  // Fixed: was 'movie-credits'
+        ApiClient.call('videos', { movieId })    // Fixed: was 'movie-videos'
       ]);
 
       return {
@@ -37,7 +41,9 @@ export class BattleService {
         revenue: movieDetails?.revenue || null,
         popularity: movieDetails?.popularity || 0,
         vote_count: movieDetails?.vote_count || 0,
-        imdb_id: movieDetails?.imdb_id
+        imdb_id: movieDetails?.imdb_id,
+        runtime: movieDetails?.runtime || null,
+        release_date: movieDetails?.release_date || null
       };
     } catch (error) {
       console.error('Error fetching detailed movie data:', error);
@@ -47,7 +53,9 @@ export class BattleService {
         budget: null,
         revenue: null,
         popularity: 0,
-        vote_count: 0
+        vote_count: 0,
+        runtime: null,
+        release_date: null
       };
     }
   }
@@ -76,6 +84,9 @@ export class BattleService {
     // Cast size score
     const castSizeScore = data1.cast.length - data2.cast.length;
 
+    // Runtime score (longer movies often indicate more content)
+    const runtimeScore = (data1.runtime || 0) - (data2.runtime || 0);
+
     // Calculate total weighted score with improved algorithm
     // Weights: Rating 40%, Popularity 15%, Vote Count 15%, Revenue 15%, Budget 10%, Cast 5%
     const normalizedRating = ratingScore / 10; // -1 to 1
@@ -100,6 +111,7 @@ export class BattleService {
       revenueScore,
       budgetScore,
       castSizeScore,
+      runtimeScore,
       totalScore
     };
   }
