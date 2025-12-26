@@ -2,11 +2,14 @@ import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import useFavorites from "@/hooks/useFavorites";
+import useWatchlist from "@/hooks/useWatchlist";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import MovieCard from "@/components/MovieCard";
 import FilterPanel from "@/components/FilterPanel";
 import FavoritesModal from "@/components/FavoritesModal";
+import WatchlistModal from "@/components/WatchlistModal";
+import MovieCategoriesSection from "@/components/MovieCategoriesSection";
 import AboutSection from "@/components/AboutSection";
 import Footer from "@/components/Footer";
 import { 
@@ -37,7 +40,9 @@ const Index = () => {
   const [shownMovieIds, setShownMovieIds] = useLocalStorage<number[]>('cinepick-shown-movies', []);
   const [userPreferences, setUserPreferences] = useLocalStorage('cinepick-preferences', currentFilters);
   const [showFavorites, setShowFavorites] = useState(false);
+  const [showWatchlist, setShowWatchlist] = useState(false);
   const { favorites, isFavorite, toggleFavorite, removeFromFavorites } = useFavorites();
+  const { watchlist, isInWatchlist, toggleWatchlist, removeFromWatchlist } = useWatchlist();
 
   // Load genres on component mount
   useEffect(() => {
@@ -134,9 +139,28 @@ const Index = () => {
       poster_path: movie.poster_path,
       vote_average: movie.vote_average,
       release_date: movie.release_date,
-      overview: movie.overview,
+      overview: movie.overview || '',
     };
     toggleFavorite(favoriteMovie);
+  };
+
+  const handleAddToWatchlist = (movie: Movie) => {
+    const watchlistMovie = {
+      id: movie.id,
+      title: movie.title,
+      poster_path: movie.poster_path,
+      vote_average: movie.vote_average,
+      release_date: movie.release_date,
+      overview: movie.overview || '',
+    };
+    toggleWatchlist(watchlistMovie);
+    
+    if (!isInWatchlist(movie.id)) {
+      toast({
+        title: "Added to Watchlist",
+        description: `${movie.title} has been added to your watchlist.`,
+      });
+    }
   };
 
   const handleScrollToSection = (sectionId: string) => {
@@ -153,6 +177,8 @@ const Index = () => {
         onScrollToSection={handleScrollToSection}
         onShowFavorites={() => setShowFavorites(true)}
         favoritesCount={favorites.length}
+        onShowWatchlist={() => setShowWatchlist(true)}
+        watchlistCount={watchlist.length}
       />
       
       <main>
@@ -175,6 +201,14 @@ const Index = () => {
             </div>
           </section>
         )}
+
+        {/* Movie Categories Section */}
+        <MovieCategoriesSection
+          onAddToWatchlist={handleAddToWatchlist}
+          onToggleFavorite={handleToggleFavorite}
+          isInWatchlist={isInWatchlist}
+          isFavorite={isFavorite}
+        />
         
         <AboutSection />
       </main>
@@ -194,6 +228,14 @@ const Index = () => {
         onClose={() => setShowFavorites(false)}
         favorites={favorites}
         onRemoveFavorite={removeFromFavorites}
+        onWatchTrailer={handleWatchTrailer}
+      />
+
+      <WatchlistModal
+        isOpen={showWatchlist}
+        onClose={() => setShowWatchlist(false)}
+        watchlist={watchlist}
+        onRemove={removeFromWatchlist}
         onWatchTrailer={handleWatchTrailer}
       />
     </div>
