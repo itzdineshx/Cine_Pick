@@ -74,15 +74,28 @@ const Index = () => {
 
   // Register service worker for PWA
   useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js')
-        .then((registration) => {
-          console.log('SW registered: ', registration);
-        })
-        .catch((registrationError) => {
-          console.log('SW registration failed: ', registrationError);
+    if (!('serviceWorker' in navigator)) return;
+
+    // In Vite dev, a service worker can break HMR (/@vite, /@react-refresh) and
+    // cause opaque redirect/CORS failures in tunnel environments (e.g. Codespaces).
+    if (!import.meta.env.PROD) {
+      navigator.serviceWorker
+        .getRegistrations()
+        .then((registrations) => registrations.forEach((r) => r.unregister()))
+        .catch(() => {
+          // no-op
         });
+      return;
     }
+
+    navigator.serviceWorker
+      .register('/sw.js')
+      .then((registration) => {
+        console.log('SW registered: ', registration);
+      })
+      .catch((registrationError) => {
+        console.log('SW registration failed: ', registrationError);
+      });
   }, []);
 
   const handlePickMovie = async (filters?: Filters) => {

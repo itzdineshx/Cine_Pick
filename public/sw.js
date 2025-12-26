@@ -1,21 +1,38 @@
 const CACHE_NAME = 'cinepick-v1';
 const urlsToCache = [
   '/',
-  '/static/js/bundle.js',
-  '/static/css/main.css',
   '/manifest.json'
 ];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(urlsToCache))
+      .then(async (cache) => {
+        // Don't fail the SW install if a resource is missing.
+        // (Important for Vite where CRA paths like /static/* don't exist.)
+        await Promise.allSettled(urlsToCache.map((url) => cache.add(url)));
+      })
   );
 });
 
 self.addEventListener('fetch', (event) => {
   // Only cache GET requests
   if (event.request.method !== 'GET') return;
+
+  const url = new URL(event.request.url);
+
+  // Only handle same-origin requests.
+  if (url.origin !== self.location.origin) return;
+
+  // Avoid interfering with Vite dev server internals / HMR.
+  // These paths should always go straight to the network.
+  if (
+    url.pathname.startsWith('/@vite/') ||
+    url.pathname.startsWith('/@react-refresh') ||
+    url.pathname.startsWith('/src/')
+  ) {
+    return;
+  }
   
   // Skip API requests for now
   if (event.request.url.includes('/api/')) return;
