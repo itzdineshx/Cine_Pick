@@ -133,11 +133,12 @@ serve(async (req) => {
         } 
       }
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error in tmdb-api function:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error'
     return new Response(
       JSON.stringify({ 
-        error: error.message || 'Internal server error',
+        error: errorMessage,
         details: 'Check if TMDB_API_KEY is set in Supabase secrets'
       }),
       { 
