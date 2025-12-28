@@ -13,6 +13,7 @@ interface MovieCategoriesSectionProps {
   onToggleFavorite: (movie: Movie) => void;
   isInWatchlist: (id: number) => boolean;
   isFavorite: (id: number) => boolean;
+  onMovieClick?: (movieId: number) => void;
 }
 
 const MovieCategoriesSection = ({
@@ -20,6 +21,7 @@ const MovieCategoriesSection = ({
   onToggleFavorite,
   isInWatchlist,
   isFavorite,
+  onMovieClick,
 }: MovieCategoriesSectionProps) => {
   // Memoize fetch functions to prevent unnecessary re-renders
   const fetchTrending = useCallback(() => getPopularMovies(1), []);
@@ -46,6 +48,7 @@ const MovieCategoriesSection = ({
           onToggleFavorite={onToggleFavorite}
           isInWatchlist={isInWatchlist}
           isFavorite={isFavorite}
+          onMovieClick={onMovieClick}
         />
 
         <MovieCarousel
@@ -55,6 +58,7 @@ const MovieCategoriesSection = ({
           onToggleFavorite={onToggleFavorite}
           isInWatchlist={isInWatchlist}
           isFavorite={isFavorite}
+          onMovieClick={onMovieClick}
         />
 
         <MovieCarousel
@@ -64,6 +68,7 @@ const MovieCategoriesSection = ({
           onToggleFavorite={onToggleFavorite}
           isInWatchlist={isInWatchlist}
           isFavorite={isFavorite}
+          onMovieClick={onMovieClick}
         />
 
         <MovieCarousel
@@ -73,6 +78,7 @@ const MovieCategoriesSection = ({
           onToggleFavorite={onToggleFavorite}
           isInWatchlist={isInWatchlist}
           isFavorite={isFavorite}
+          onMovieClick={onMovieClick}
         />
       </div>
     </section>

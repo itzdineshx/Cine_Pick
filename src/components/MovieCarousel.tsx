@@ -11,6 +11,7 @@ interface MovieCarouselProps {
   onToggleFavorite?: (movie: Movie) => void;
   isInWatchlist?: (id: number) => boolean;
   isFavorite?: (id: number) => boolean;
+  onMovieClick?: (movieId: number) => void;
 }
 
 const MovieCarousel = ({ 
@@ -19,7 +20,8 @@ const MovieCarousel = ({
   onAddToWatchlist, 
   onToggleFavorite,
   isInWatchlist,
-  isFavorite 
+  isFavorite,
+  onMovieClick
 }: MovieCarouselProps) => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -110,7 +112,8 @@ const MovieCarousel = ({
           {movies.map((movie) => (
             <div 
               key={movie.id} 
-              className="flex-shrink-0 w-40 group/card relative"
+              className="flex-shrink-0 w-40 group/card relative cursor-pointer"
+              onClick={() => onMovieClick?.(movie.id)}
             >
               <div className="relative overflow-hidden rounded-lg card-cinema">
                 <img

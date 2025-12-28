@@ -7,7 +7,7 @@ export { ApiClient } from './api-client'
 
 // Legacy API compatibility - these will use edge functions when Supabase is connected
 import { MovieService } from './movie-service'
-import { Genre, Movie, Filters, MovieResponse, Cast, Video } from './types'
+import { Genre, Movie, Filters, MovieResponse, Cast, Video, Review, MovieFullDetails } from './types'
 import { ApiClient } from './api-client'
 
 // Main exports that use the new service architecture
@@ -118,4 +118,23 @@ export const getYouTubeTrailerUrl = async (movieId: number): Promise<string | nu
 export const getTrailerUrl = (movieTitle: string): string => {
   const query = encodeURIComponent(`${movieTitle} trailer`)
   return `https://www.youtube.com/results?search_query=${query}`
+}
+
+export const getMovieFullDetails = async (movieId: number): Promise<MovieFullDetails | null> => {
+  try {
+    return await ApiClient.call('movie-full-details', { movieId })
+  } catch (error) {
+    console.error('Error fetching movie full details:', error)
+    return null
+  }
+}
+
+export const getMovieReviews = async (movieId: number, page: number = 1): Promise<Review[]> => {
+  try {
+    const data = await ApiClient.call('reviews', { movieId, filters: { page } })
+    return data.results || []
+  } catch (error) {
+    console.error('Error fetching movie reviews:', error)
+    return []
+  }
 }

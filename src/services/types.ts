@@ -42,6 +42,35 @@ export interface Video {
   type: string;
 }
 
+export interface Review {
+  id: string;
+  author: string;
+  author_details: {
+    name: string;
+    username: string;
+    avatar_path: string | null;
+    rating: number | null;
+  };
+  content: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface MovieFullDetails extends Movie {
+  backdrop_path: string | null;
+  budget: number;
+  revenue: number;
+  tagline: string;
+  status: string;
+  credits: {
+    cast: Cast[];
+    crew: { id: number; name: string; job: string; department: string }[];
+  };
+  videos: Video[];
+  reviews: Review[];
+  similar: Movie[];
+}
+
 export interface MovieResponse {
   results: Movie[];
   total_pages: number;
