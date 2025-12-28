@@ -70,6 +70,12 @@ export class ApiClient {
 
       case 'videos':
         return await this.getVideosDirect(params.movieId)
+
+      case 'reviews':
+        return await this.getReviewsDirect(params.movieId, params.filters?.page || 1)
+
+      case 'movie-full-details':
+        return await this.getMovieFullDetailsDirect(params.movieId)
       
       default:
         throw new Error(`No fallback available for action: ${action}`)
@@ -183,5 +189,30 @@ export class ApiClient {
     const response = await fetch(`${TMDB_BASE_URL}/movie/${movieId}/videos?api_key=${TMDB_API_KEY}`)
     if (!response.ok) throw new Error(`TMDB API error: ${response.status}`)
     return await response.json()
+  }
+
+  private static async getReviewsDirect(movieId: number, page: number) {
+    const response = await fetch(`${TMDB_BASE_URL}/movie/${movieId}/reviews?api_key=${TMDB_API_KEY}&page=${page}`)
+    if (!response.ok) throw new Error(`TMDB API error: ${response.status}`)
+    return await response.json()
+  }
+
+  private static async getMovieFullDetailsDirect(movieId: number) {
+    // Fetch all movie details in parallel
+    const [details, credits, videos, reviews, similar] = await Promise.all([
+      fetch(`${TMDB_BASE_URL}/movie/${movieId}?api_key=${TMDB_API_KEY}`).then(r => r.json()),
+      fetch(`${TMDB_BASE_URL}/movie/${movieId}/credits?api_key=${TMDB_API_KEY}`).then(r => r.json()),
+      fetch(`${TMDB_BASE_URL}/movie/${movieId}/videos?api_key=${TMDB_API_KEY}`).then(r => r.json()),
+      fetch(`${TMDB_BASE_URL}/movie/${movieId}/reviews?api_key=${TMDB_API_KEY}&page=1`).then(r => r.json()),
+      fetch(`${TMDB_BASE_URL}/movie/${movieId}/similar?api_key=${TMDB_API_KEY}&page=1`).then(r => r.json())
+    ])
+
+    return {
+      ...details,
+      credits,
+      videos: videos.results || [],
+      reviews: reviews.results || [],
+      similar: similar.results || []
+    }
   }
 }
