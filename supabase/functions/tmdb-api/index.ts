@@ -113,6 +113,45 @@ serve(async (req) => {
       case 'videos':
         response = await fetch(`${baseUrl}/movie/${movieId}/videos?api_key=${tmdbApiKey}`)
         break
+
+      case 'reviews':
+        response = await fetch(`${baseUrl}/movie/${movieId}/reviews?api_key=${tmdbApiKey}&page=${filters?.page || 1}`)
+        break
+
+      case 'movie-full-details': {
+        // Fetch all movie details in parallel
+        const [detailsRes, creditsRes, videosRes, reviewsRes, similarRes] = await Promise.all([
+          fetch(`${baseUrl}/movie/${movieId}?api_key=${tmdbApiKey}`),
+          fetch(`${baseUrl}/movie/${movieId}/credits?api_key=${tmdbApiKey}`),
+          fetch(`${baseUrl}/movie/${movieId}/videos?api_key=${tmdbApiKey}`),
+          fetch(`${baseUrl}/movie/${movieId}/reviews?api_key=${tmdbApiKey}&page=1`),
+          fetch(`${baseUrl}/movie/${movieId}/similar?api_key=${tmdbApiKey}&page=1`)
+        ])
+
+        const [details, credits, videos, reviews, similar] = await Promise.all([
+          detailsRes.json(),
+          creditsRes.json(),
+          videosRes.json(),
+          reviewsRes.json(),
+          similarRes.json()
+        ])
+
+        return new Response(
+          JSON.stringify({
+            ...details,
+            credits,
+            videos: videos.results || [],
+            reviews: reviews.results || [],
+            similar: similar.results || []
+          }),
+          { 
+            headers: { 
+              ...corsHeaders, 
+              'Content-Type': 'application/json' 
+            } 
+          }
+        )
+      }
         
       default:
         throw new Error(`Invalid action: ${action}`)

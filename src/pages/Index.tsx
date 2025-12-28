@@ -9,6 +9,7 @@ import MovieCard from "@/components/MovieCard";
 import FilterPanel from "@/components/FilterPanel";
 import FavoritesModal from "@/components/FavoritesModal";
 import WatchlistModal from "@/components/WatchlistModal";
+import MovieDetailModal from "@/components/MovieDetailModal";
 import MovieCategoriesSection from "@/components/MovieCategoriesSection";
 import AboutSection from "@/components/AboutSection";
 import Footer from "@/components/Footer";
@@ -41,6 +42,7 @@ const Index = () => {
   const [userPreferences, setUserPreferences] = useLocalStorage('cinepick-preferences', currentFilters);
   const [showFavorites, setShowFavorites] = useState(false);
   const [showWatchlist, setShowWatchlist] = useState(false);
+  const [selectedMovieId, setSelectedMovieId] = useState<number | null>(null);
   const { favorites, isFavorite, toggleFavorite, removeFromFavorites } = useFavorites();
   const { watchlist, isInWatchlist, toggleWatchlist, removeFromWatchlist } = useWatchlist();
 
@@ -221,6 +223,7 @@ const Index = () => {
           onToggleFavorite={handleToggleFavorite}
           isInWatchlist={isInWatchlist}
           isFavorite={isFavorite}
+          onMovieClick={(movieId) => setSelectedMovieId(movieId)}
         />
         
         <AboutSection />
@@ -250,6 +253,17 @@ const Index = () => {
         watchlist={watchlist}
         onRemove={removeFromWatchlist}
         onWatchTrailer={handleWatchTrailer}
+      />
+
+      <MovieDetailModal
+        movieId={selectedMovieId}
+        isOpen={selectedMovieId !== null}
+        onClose={() => setSelectedMovieId(null)}
+        onAddToWatchlist={handleAddToWatchlist}
+        onToggleFavorite={handleToggleFavorite}
+        isInWatchlist={isInWatchlist}
+        isFavorite={isFavorite}
+        onMovieClick={(movieId) => setSelectedMovieId(movieId)}
       />
     </div>
   );

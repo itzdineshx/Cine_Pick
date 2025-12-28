@@ -10,6 +10,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import FavoritesModal from '@/components/FavoritesModal';
 import WatchlistModal from '@/components/WatchlistModal';
+import MovieDetailModal from '@/components/MovieDetailModal';
 import { searchMovies, fetchGenres, discoverMoviesWithPagination, getTrailerUrl, type Movie, type Genre } from '@/services/tmdb';
 import useSearchHistory from '@/hooks/useSearchHistory';
 import useFavorites from '@/hooks/useFavorites';
@@ -44,6 +45,7 @@ const [selectedGenre, setSelectedGenre] = useState<string>('all');
   // Modals
   const [showFavorites, setShowFavorites] = useState(false);
   const [showWatchlist, setShowWatchlist] = useState(false);
+  const [selectedMovieId, setSelectedMovieId] = useState<number | null>(null);
 
   // Hooks
   const { searchHistory, addToHistory, removeFromHistory, clearHistory } = useSearchHistory();
@@ -361,7 +363,11 @@ const [selectedGenre, setSelectedGenre] = useState<string>('all');
 
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
                 {movies.map((movie) => (
-                  <div key={movie.id} className="group relative">
+                  <div 
+                    key={movie.id} 
+                    className="group relative cursor-pointer"
+                    onClick={() => setSelectedMovieId(movie.id)}
+                  >
                     <div className="relative overflow-hidden rounded-lg card-cinema">
                       <img
                         src={movie.poster_path 
@@ -465,6 +471,17 @@ const [selectedGenre, setSelectedGenre] = useState<string>('all');
         watchlist={watchlist}
         onRemove={removeFromWatchlist}
         onWatchTrailer={getTrailerUrl}
+      />
+
+      <MovieDetailModal
+        movieId={selectedMovieId}
+        isOpen={selectedMovieId !== null}
+        onClose={() => setSelectedMovieId(null)}
+        onAddToWatchlist={handleToggleWatchlist}
+        onToggleFavorite={handleToggleFavorite}
+        isInWatchlist={isInWatchlist}
+        isFavorite={isFavorite}
+        onMovieClick={(movieId) => setSelectedMovieId(movieId)}
       />
     </div>
   );
