@@ -36,8 +36,8 @@ const Search = () => {
   const [hasMore, setHasMore] = useState(false);
   
   // Filters
-  const [selectedGenre, setSelectedGenre] = useState<string>('');
-  const [selectedYear, setSelectedYear] = useState<string>('');
+const [selectedGenre, setSelectedGenre] = useState<string>('all');
+  const [selectedYear, setSelectedYear] = useState<string>('all');
   const [minRating, setMinRating] = useState<number>(0);
   const [sortBy, setSortBy] = useState<string>('popularity.desc');
 
@@ -68,8 +68,8 @@ const Search = () => {
         if (pageNum === 1) addToHistory(searchQuery);
       } else {
         data = await discoverMoviesWithPagination({
-          genres: selectedGenre ? [parseInt(selectedGenre)] : [],
-          yearRange: selectedYear ? [parseInt(selectedYear), parseInt(selectedYear)] : [1900, currentYear],
+          genres: selectedGenre && selectedGenre !== 'all' ? [parseInt(selectedGenre)] : [],
+          yearRange: selectedYear && selectedYear !== 'all' ? [parseInt(selectedYear), parseInt(selectedYear)] : [1900, currentYear],
           minRating: minRating,
           sortBy: sortBy,
           page: pageNum,
@@ -224,7 +224,7 @@ const Search = () => {
                       <SelectValue placeholder="All Genres" />
                     </SelectTrigger>
                     <SelectContent className="bg-popover">
-                      <SelectItem value="">All Genres</SelectItem>
+                      <SelectItem value="all">All Genres</SelectItem>
                       {genres.map((genre) => (
                         <SelectItem key={genre.id} value={genre.id.toString()}>
                           {genre.name}
@@ -241,7 +241,7 @@ const Search = () => {
                       <SelectValue placeholder="All Years" />
                     </SelectTrigger>
                     <SelectContent className="bg-popover max-h-60">
-                      <SelectItem value="">All Years</SelectItem>
+                      <SelectItem value="all">All Years</SelectItem>
                       {yearOptions.map((year) => (
                         <SelectItem key={year} value={year.toString()}>
                           {year}
