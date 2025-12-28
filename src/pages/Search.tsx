@@ -225,8 +225,8 @@ const [selectedGenre, setSelectedGenre] = useState<string>('all');
                     </SelectTrigger>
                     <SelectContent className="bg-popover">
                       <SelectItem value="all">All Genres</SelectItem>
-                      {genres.map((genre) => (
-                        <SelectItem key={genre.id} value={genre.id.toString()}>
+                      {genres.filter(genre => genre.id != null && genre.id !== 0).map((genre) => (
+                        <SelectItem key={genre.id} value={String(genre.id)}>
                           {genre.name}
                         </SelectItem>
                       ))}
